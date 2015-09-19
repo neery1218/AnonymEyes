@@ -138,10 +138,11 @@ public class NetworkThread extends Thread {
         final int frameSize = width * height;
         int a = 0;
 
-        for (int j = 0; j < height; ++j) {
+        for (int i = 0; i < height; ++i) {
             int idx = 34;
             int offset = 0;
-            for (int i = 0; i < width; ++i) {
+            sendBuf[i][idx] = 0;
+            for (int j = 0; j < width; ++j) {
 
                 int y = (0xff & ((int) data[i * width + j]));
                 int v = (0xff & ((int) data[frameSize + (i >> 1) * width + (j & ~1) + 0]));
@@ -160,12 +161,12 @@ public class NetworkThread extends Thread {
                 b >>= 4;
 
                 //argb[a++] = 0xff000000 | (r << 16) | (g << 8) | b;
-                sendBuf[j][idx] |= (b << offset);
-                offset ^= 4; if(offset == 0) { idx++; sendBuf[j][idx] = 0; }
-                sendBuf[j][idx] |= (g << offset);
-                offset ^= 4; if(offset == 0) { idx++; sendBuf[j][idx] = 0; }
-                sendBuf[j][idx] |= (r << offset);
-                offset ^= 4; if(offset == 0) { idx++; sendBuf[j][idx] = 0; }
+                sendBuf[i][idx] |= (b << offset);
+                offset ^= 4; if(offset == 0) { idx++; sendBuf[i][idx] = 0; }
+                sendBuf[i][idx] |= (g << offset);
+                offset ^= 4; if(offset == 0) { idx++; sendBuf[i][idx] = 0; }
+                sendBuf[i][idx] |= (r << offset);
+                offset ^= 4; if(offset == 0) { idx++; sendBuf[i][idx] = 0; }
             }
         }
     }
