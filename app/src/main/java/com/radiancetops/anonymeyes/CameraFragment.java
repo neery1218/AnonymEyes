@@ -35,12 +35,7 @@ public class CameraFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private Camera camera;
     private CameraPreview cameraPreview;
-    private MarkerView markerView;
-    private TextView resistanceTextView;
-    private TextView instructionsTextView;
-    private LineView lineView;
-    private float stripheight;
-    private Button singleButton;
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;

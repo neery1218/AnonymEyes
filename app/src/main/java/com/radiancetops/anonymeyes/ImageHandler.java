@@ -24,8 +24,6 @@ public class ImageHandler implements Camera.PreviewCallback {
 
 	private static double h, s, l, r, g, b;
 
-    TextView rtv;
-    MarkerView markerTextView;
 
     public ImageHandler(int width, int height) {
         super();
