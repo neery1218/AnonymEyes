@@ -3,6 +3,7 @@ package com.radiancetops.anonymeyes;
 import android.hardware.Camera;
 import android.util.Log;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -17,11 +18,13 @@ public class NetworkThread extends Thread {
     private byte[] buf;
     private long id;
 
-    private byte[] sendBuf = new byte[65000];
+    //private byte[] sendBuf = new byte[65000];
+    private byte[] []sendBuf;
 
     private double longitude, latitude;
 
     private int width, height;
+    private int frameNum;
 
     private DatagramSocket socket;
     private DatagramPacket packet;
@@ -34,6 +37,8 @@ public class NetworkThread extends Thread {
         this.latitude = latitude;
         this.width = width;
         this.height = height;
+        frameNum = 0;
+        sendBuf = new byte [height][512];
         this.id = (new Random().nextLong());
         try {
             socket = new DatagramSocket();
@@ -42,20 +47,24 @@ public class NetworkThread extends Thread {
         catch (Exception e){
             Log.v("Socket Connection","connection failed!");
         }
-
-        prepareSendBuf();
+        for (int i = 0; i < height; i++)
+            prepareSendBuf(i);
     }
 
-    private void prepareSendBuf() {
-        longToBytes(sendBuf, id, 0);
+    private void prepareSendBuf(int row) {
+        longToBytes(sendBuf[row], id, 0);
         long l = Double.doubleToLongBits(latitude);
-        longToBytes(sendBuf, l, 8);
+        longToBytes(sendBuf[row], l, 8);
         l = Double.doubleToLongBits(longitude);
-        longToBytes(sendBuf, l, 16);
-        sendBuf[24] = (byte) ((width & 0xff00) >> 8);
-        sendBuf[25] = (byte) ((width & 0x00ff) >> 0);
-        sendBuf[26] = (byte) ((height & 0xff00) >> 8);
-        sendBuf[27] = (byte) ((height & 0x00ff) >> 0);
+        longToBytes(sendBuf[row], l, 16);
+        sendBuf[row][24] = (byte) ((width & 0xff00) >> 8);
+        sendBuf[row][25] = (byte) ((width & 0x00ff) >> 0);
+        sendBuf[row][26] = (byte) ((height & 0xff00) >> 8);
+        sendBuf[row][27] = (byte) ((height & 0x00ff) >> 0);
+
+        sendBuf[row][28] = (byte) ((row & 0xff00) >> 8);
+        sendBuf[row][29] = (byte) ((row & 0x00ff) >> 0);
+
     }
 
     private void longToBytes(byte[] b, long v, int idx) {
@@ -84,18 +93,18 @@ public class NetworkThread extends Thread {
             this.camera.addCallbackBuffer(buf);
 
             try {
-                packet = new DatagramPacket(sendBuf, 1000/*28+(1+3*width*height)/2*/, InetAddress.getByName("104.197.49.2"), 52525);
+                for (int i = 0; i < height; i++) {
+                    packet = new DatagramPacket(sendBuf[i], sendBuf[i].length/*28+(1+3*width*height)/2*/, InetAddress.getByName("104.197.49.2"), 52525);
+                    socket.send(packet);
+                    Log.v("NetworkThread", "created packet of size " + packet.getLength());
+                }
                 //packet = new DatagramPacket(new byte[10], 10, InetAddress.getByName("104.197.49.2"), 52525);
-                Log.v("NetworkThread", "created packet of size " + packet.getLength());
+
             }
             catch(UnknownHostException e){
                 Log.v("Packet","packet creation failed");
             }
-            try{
-                socket.send(packet);
-                Log.v("NetworkThread", "packet sent");
-            }
-            catch (Exception e){
+            catch (IOException e){
                 Log.v("Socket", "send failed", e);
             }
         }
@@ -108,16 +117,32 @@ public class NetworkThread extends Thread {
     public void sendFrame(byte[] frame, Camera camera) {
         this.camera = camera;
         this.inFrame = frame;
+        addFrameNumber();
         this.interrupt();
+        frameNum++;
+    }
+
+    private void addFrameNumber (){//bytes 30-33 are frame number
+        Log.v("Frame",""+frameNum);
+        for (int i = 0; i < height; i++){
+            sendBuf[i][30] = (byte) ((frameNum & 0xff000000) >> 24);
+            sendBuf[i][31] = (byte) ((frameNum & 0x00ff0000) >> 16);
+            sendBuf[i][32] = (byte) ((frameNum & 0x0000ff00) >> 8);
+            sendBuf[i][33] = (byte) ((frameNum & 0x000000ff) >> 0);
+
+
+        }
     }
 
     private void decodeNV21(byte[] data, int width, int height) {
         final int frameSize = width * height;
-        int idx = 28;
-        int offset = 0;
         int a = 0;
-        for (int i = 0; i < width; ++i) {
-            for (int j = 0; j < height; ++j) {
+
+        for (int j = 0; j < height; ++j) {
+            int idx = 34;
+            int offset = 0;
+            for (int i = 0; i < width; ++i) {
+
                 int y = (0xff & ((int) data[i * width + j]));
                 int v = (0xff & ((int) data[frameSize + (i >> 1) * width + (j & ~1) + 0]));
                 int u = (0xff & ((int) data[frameSize + (i >> 1) * width + (j & ~1) + 1]));
@@ -135,12 +160,12 @@ public class NetworkThread extends Thread {
                 b >>= 4;
 
                 //argb[a++] = 0xff000000 | (r << 16) | (g << 8) | b;
-                sendBuf[idx] |= (b << offset);
-                offset ^= 4; if(offset == 0) { idx++; sendBuf[idx] = 0; }
-                sendBuf[idx] |= (g << offset);
-                offset ^= 4; if(offset == 0) { idx++; sendBuf[idx] = 0; }
-                sendBuf[idx] |= (r << offset);
-                offset ^= 4; if(offset == 0) { idx++; sendBuf[idx] = 0; }
+                sendBuf[j][idx] |= (b << offset);
+                offset ^= 4; if(offset == 0) { idx++; sendBuf[j][idx] = 0; }
+                sendBuf[j][idx] |= (g << offset);
+                offset ^= 4; if(offset == 0) { idx++; sendBuf[j][idx] = 0; }
+                sendBuf[j][idx] |= (r << offset);
+                offset ^= 4; if(offset == 0) { idx++; sendBuf[j][idx] = 0; }
             }
         }
     }
