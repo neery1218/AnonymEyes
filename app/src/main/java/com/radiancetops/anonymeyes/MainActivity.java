@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.On
                 mGoogleApiClient);
         if (mLastLocation != null) {
             Log.v("Location: ", String.valueOf(mLastLocation.getLatitude()) + "  " + String.valueOf(mLastLocation.getLongitude()));
+            latitude = mLastLocation.getLatitude();
+            longitude = mLastLocation.getLongitude();
             getFragmentManager()
                     .beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
