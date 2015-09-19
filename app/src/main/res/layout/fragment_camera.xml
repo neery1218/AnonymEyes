@@ -12,5 +12,10 @@
         android:layout_height="match_parent" >
     </FrameLayout>
 
+    <com.radiancetops.anonymeyes.RecorderView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/recorderView" />
+
 
 </RelativeLayout>
