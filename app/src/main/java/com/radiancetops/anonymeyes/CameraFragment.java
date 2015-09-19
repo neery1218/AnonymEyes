@@ -76,6 +76,11 @@ public class CameraFragment extends Fragment {
         int h = p.getPreviewSize().height;
         Log.d("CameraFragment", "w: " + w + " h: " + h);
 
+       List<Camera.Size> sizes= p.getSupportedPreviewSizes();
+        for (int i = 0; i < sizes.size(); i++)
+            Log.v("Size:",i+" "+sizes.get(i).height + " "+sizes.get(i).width);
+        p.setPreviewSize(sizes.get(sizes.size()-1).width,sizes.get(sizes.size()-1).height);
+
         camera.setParameters(p);
     }
 

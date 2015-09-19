@@ -5,6 +5,11 @@ import android.util.Log;
 import android.widget.TextView;
 
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -22,7 +27,11 @@ public class ImageHandler implements Camera.PreviewCallback {
 
     private int[] idxs, cols;
 
-	private static double h, s, l, r, g, b;
+    private static double h, s, l, r, g, b;
+    private double latitude;
+    private double longitude;
+
+    private NetworkThread networkHandler;
 
 
     public ImageHandler(int width, int height) {
@@ -38,12 +47,19 @@ public class ImageHandler implements Camera.PreviewCallback {
 
         this.idxs = new int[4];
         this.cols = new int[4];
+
+        this.networkHandler = new NetworkThread();
+        this.networkHandler.start();
     }
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        Log.v("test", "test");
-        // Decode the image data to HSL
+        Log.v("test", "Frame");
+
+        latitude = MainActivity.getLatitude();
+        longitude = MainActivity.getLongitude();
+        //TODO: packet format, Sean
+        networkHandler.sendFrame(data);
 
          camera.addCallbackBuffer(data);
         //camera.autoFocus(null);

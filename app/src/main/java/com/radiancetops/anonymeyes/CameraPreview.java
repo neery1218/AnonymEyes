@@ -15,6 +15,10 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 
 
 /** A basic Camera preview class */
@@ -28,6 +32,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private ImageHandler handler;
     private byte[] handleBuffer;
 
+
     public CameraPreview(Context context) {
         super(context);
         this.context = context;
@@ -38,6 +43,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+
+
     }
 
     public void initVals(Camera camera) {
