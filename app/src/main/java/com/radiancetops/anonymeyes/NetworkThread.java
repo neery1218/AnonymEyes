@@ -54,8 +54,10 @@ public class NetworkThread extends Thread {
     private void prepareSendBuf(int row) {
         longToBytes(sendBuf[row], id, 0);
         long l = Double.doubleToLongBits(latitude);
+        Log.d("NetworkThread", "lat long: " + Long.toHexString(l) + " : " + Double.longBitsToDouble(l));
         longToBytes(sendBuf[row], l, 8);
         l = Double.doubleToLongBits(longitude);
+        Log.d("NetworkThread", "lon long: " + Long.toHexString(l) + " : " + Double.longBitsToDouble(l));
         longToBytes(sendBuf[row], l, 16);
         sendBuf[row][24] = (byte) ((width & 0xff00) >> 8);
         sendBuf[row][25] = (byte) ((width & 0x00ff) >> 0);
@@ -65,12 +67,37 @@ public class NetworkThread extends Thread {
         sendBuf[row][28] = (byte) ((row & 0xff00) >> 8);
         sendBuf[row][29] = (byte) ((row & 0x00ff) >> 0);
 
+        long a = bytesToLong(sendBuf[row], 8);
+        double y = Double.longBitsToDouble(a);
+        Log.d("NetworkThread", "lat long: " + Long.toHexString(a) + " ; " + y);
+        long b = bytesToLong(sendBuf[row], 16);
+        double x = Double.longBitsToDouble(b);
+        Log.d("NetworkThread", "lon long: " + Long.toHexString(b) + " ; " + x);
+
     }
 
     private void longToBytes(byte[] b, long v, int idx) {
-        for(int i = 0; i < 8; i++) {
-            b[i + idx] = (byte) ((v >> (8 * (7 - i))) & 0xff);
+        /*b[idx+0] = (byte) ((0xff00000000000000L & v) >>> 56);
+        b[idx+1] = (byte) ((0x00ff000000000000L & v) >>> 48);
+        b[idx+2] = (byte) ((0x0000ff0000000000L & v) >>> 40);
+        b[idx+3] = (byte) ((0x000000ff00000000L & v) >>> 32);
+        b[idx+4] = (byte) ((0x00000000ff000000L & v) >>> 24);
+        b[idx+5] = (byte) ((0x0000000000ff0000L & v) >>> 16);
+        b[idx+6] = (byte) ((0x000000000000ff00L & v) >>>  8);
+        b[idx+7] = (byte) ((0x00000000000000ffL & v) >>>  0);*/
+        for(int i = 7; i >= 0; i--) {
+            b[idx + i] = (byte) (v & 0xff);
+            v >>>= 8;
         }
+    }
+
+    private long bytesToLong(byte[] b, int idx) {
+        long result = 0;
+        for (int i = 0; i < 8; i++) {
+            result <<= 8;
+            result |= (b[i+idx] & 0xFF);
+        }
+        return result;
     }
 
     @Override
@@ -102,10 +129,10 @@ public class NetworkThread extends Thread {
 
             }
             catch(UnknownHostException e){
-                Log.v("Packet","packet creation failed");
+                Log.d("Packet","packet creation failed");
             }
             catch (IOException e){
-                Log.v("Socket", "send failed", e);
+                Log.d("Socket", "send failed", e);
             }
         }
     }
@@ -123,7 +150,7 @@ public class NetworkThread extends Thread {
     }
 
     private void addFrameNumber (){//bytes 30-33 are frame number
-        Log.v("Frame",""+frameNum);
+        Log.v("Frame", "" + frameNum);
         for (int i = 0; i < height; i++){
             sendBuf[i][30] = (byte) ((frameNum & 0xff000000) >> 24);
             sendBuf[i][31] = (byte) ((frameNum & 0x00ff0000) >> 16);
