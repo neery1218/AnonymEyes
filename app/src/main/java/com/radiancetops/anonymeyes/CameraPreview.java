@@ -40,17 +40,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
-    public void initVals(Camera camera, int stripheight, TextView t,MarkerView m) {
+    public void initVals(Camera camera) {
         this.mCamera = camera;
         Camera.Size size = mCamera.getParameters().getPreviewSize();
-        this.handler = new ImageHandler(size.width, size.height, stripheight, t,m);
+        this.handler = new ImageHandler(size.width, size.height);
         int bufsize = size.width * size.height * 3;
         handleBuffer = new byte[bufsize];
     }
 
-    public void writeCSV(){
-        handler.writeCSV();
-    }
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
         try {

@@ -13,41 +13,4 @@
     </FrameLayout>
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/instructionsTextView"
-        android:gravity="top|center"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="asdfs"
-        android:textSize="18dp"
-        android:alpha="125" />
-
-    <com.radiancetops.anonymeyes.LineView
-        android:layout_width="match_parent"
-        android:id="@+id/lineView"
-        android:layout_height="18dp"
-        android:layout_centerInParent="true"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:textSize="18dp"
-        android:id="@+id/resistanceTextView" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/singleButton" />
-
-    <com.radiancetops.anonymeyes.MarkerView
-        android:layout_width="match_parent"
-        android:id="@+id/markerView"
-        android:layout_height="48dp"
-        android:layout_centerInParent="true"/>
-
 </RelativeLayout>

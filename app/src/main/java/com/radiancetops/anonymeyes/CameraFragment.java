@@ -81,17 +81,6 @@ public class CameraFragment extends Fragment {
         int h = p.getPreviewSize().height;
         Log.d("CameraFragment", "w: " + w + " h: " + h);
 
-        /* set focus areas */
-        if(p.getMaxNumFocusAreas() > 0) {
-            Log.d("CameraFragment", "max focus areas: " + p.getMaxNumFocusAreas());
-            List<Camera.Area> areas = new ArrayList<>();
-            Rect r = new Rect(
-                    (int) (w / 2 - stripheight / 2), (int) (h / 3), (int) (w / 2 + stripheight / 2),
-                    (int) (2 * h / 3));
-            Log.d("CameraFragment", "rect: " + r.flattenToString());
-            areas.add(new Camera.Area(r, 1));
-            p.setFocusAreas(areas);
-        }
         camera.setParameters(p);
     }
 
@@ -100,28 +89,11 @@ public class CameraFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_camera, container, false);
-        TextView instructionsTextView = (TextView)view.findViewById(R.id.instructionsTextView);
         /*
         RelativeLayout.LayoutParams lineViewParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,(int)stripheight);
         lineViewParams.
         lineView.setLayoutParams(lineViewParams);
 */
-       singleButton = (Button)view.findViewById(R.id.singleButton);
-        singleButton.setVisibility(View.GONE);
-        singleButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                cameraPreview.writeCSV();
-                Log.v("data", "printing");
-            }
-        });
-        resistanceTextView = (TextView)view.findViewById(R.id.resistanceTextView);
-        resistanceTextView.setTypeface(MainActivity.typefaceHeader);
-        resistanceTextView.setText("\n" + WAITING + "\n");
-
-        instructionsTextView = (TextView)view.findViewById(R.id.instructionsTextView);
-        instructionsTextView.setTypeface(MainActivity.typefaceHeader);
-
-        markerView = (MarkerView)view.findViewById(R.id.markerView);
 
         cameraPreview = new CameraPreview(getActivity());
 
@@ -177,11 +149,11 @@ public class CameraFragment extends Fragment {
         camera = getCameraInstance();
 
         Resources r = getResources();
-        stripheight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, r.getDisplayMetrics());
+        //stripheight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, r.getDisplayMetrics());
 
-        Log.v("CameraFragment", "stripheight: " + stripheight);
+        //Log.v("CameraFragment", "stripheight: " + stripheight);
         setCamParameters(camera);
-        cameraPreview.initVals(camera, (int) stripheight, resistanceTextView, markerView);
+        cameraPreview.initVals(camera);
     }
 
     @Override
