@@ -12,10 +12,13 @@
         android:layout_height="match_parent" >
     </FrameLayout>
 
-    <com.radiancetops.anonymeyes.RecorderView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:id="@+id/recorderView" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="0:00"
+        android:id="@+id/timerView" />
 
 
 </RelativeLayout>
