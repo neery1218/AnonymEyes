@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.radiancetops.anonymeyes.CameraFragment">
+
+    <FrameLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </FrameLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/instructionsTextView"
+        android:gravity="top|center"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="asdfs"
+        android:textSize="18dp"
+        android:alpha="125" />
+
+    <com.radiancetops.anonymeyes.LineView
+        android:layout_width="match_parent"
+        android:id="@+id/lineView"
+        android:layout_height="18dp"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:textSize="18dp"
+        android:id="@+id/resistanceTextView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Button"
+        android:id="@+id/singleButton" />
+
+    <com.radiancetops.anonymeyes.MarkerView
+        android:layout_width="match_parent"
+        android:id="@+id/markerView"
+        android:layout_height="48dp"
+        android:layout_centerInParent="true"/>
+
+</RelativeLayout>
