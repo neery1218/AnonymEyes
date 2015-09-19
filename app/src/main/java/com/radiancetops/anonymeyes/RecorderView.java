@@ -38,9 +38,12 @@ public class RecorderView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        setup();
         paint = new Paint();
         paint.setColor(Color.RED);
-        canvas.drawCircle(width/2,height/2,25,paint);
+        canvas.drawCircle(width/2,height/2+4,(float)0.7*width/2,paint);
+        //canvas.drawRect(0,0,width,height,paint);
 
     }
 

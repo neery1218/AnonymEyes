@@ -12,13 +12,39 @@
         android:layout_height="match_parent" >
     </FrameLayout>
 
-    <TextView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="0:00"
-        android:id="@+id/timerView" />
+        android:layout_height="match_parent">
+        <android.widget.Space
+            android:layout_width="match_parent"
+            android:layout_height="15dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_gravity="top"
+            android:layout_height="match_parent">
+
+            <android.widget.Space
+                android:layout_width="10dp"
+                android:layout_height="match_parent" />
+
+            <com.radiancetops.anonymeyes.RecorderView
+                android:layout_width="30dp"
+                android:id="@+id/recorderView"
+                android:layout_height="30dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="0:00"
+                android:textSize="24sp"
+                android:textColor="@color/white"
+                android:id="@+id/timerView" />
+        </LinearLayout>
+    </LinearLayout>
 
 
 </RelativeLayout>

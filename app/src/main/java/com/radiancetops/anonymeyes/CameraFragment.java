@@ -46,6 +46,7 @@ public class CameraFragment extends Fragment {
     private Handler handler;
     private long startTime;
     private TimerThread timerThread;
+    private RecorderView recorderView;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -105,6 +106,7 @@ public class CameraFragment extends Fragment {
         lineViewParams.
         lineView.setLayoutParams(lineViewParams);
 */
+        recorderView = (RecorderView)view.findViewById(R.id.recorderView);
         timerView = (TextView)view.findViewById(R.id.timerView);
         startTime = SystemClock.uptimeMillis();
         timerView.setText(""+startTime);
