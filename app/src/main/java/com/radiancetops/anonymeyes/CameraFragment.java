@@ -7,6 +7,8 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -16,7 +18,12 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -35,8 +42,11 @@ public class CameraFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private Camera camera;
     private CameraPreview cameraPreview;
-
-
+    private TextView timerView;
+    private Handler handler;
+    private long startTime;
+    private TimerThread timerThread;
+    private RecorderView recorderView;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -66,6 +76,8 @@ public class CameraFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+        timerThread = new TimerThread();
+        handler = new Handler();
     }
 
     private void setCamParameters(Camera camera) {
@@ -94,7 +106,11 @@ public class CameraFragment extends Fragment {
         lineViewParams.
         lineView.setLayoutParams(lineViewParams);
 */
-
+        recorderView = (RecorderView)view.findViewById(R.id.recorderView);
+        timerView = (TextView)view.findViewById(R.id.timerView);
+        startTime = SystemClock.uptimeMillis();
+        timerView.setText(""+startTime);
+        timerThread.start();
         cameraPreview = new CameraPreview(getActivity());
 
         FrameLayout frameLayout = (FrameLayout)view.findViewById(R.id.camera_preview);
@@ -186,6 +202,48 @@ public class CameraFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
+    }
+
+    private class TimerThread extends Thread {
+        private double time = 0;
+        @Override
+        public void run() {
+            while(true) {
+                try {
+                    Thread.sleep(500);
+                    handler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            long millis = (SystemClock.uptimeMillis() - startTime);
+                            long seconds = millis/1000;
+                            long minutes = seconds/60;
+                            seconds-=minutes*60;
+                            String text = "";
+
+                            text+=minutes;
+
+                            text+=":";
+                            if (seconds < 10)
+                                text+="0";
+
+                            text+=seconds;
+
+
+                            timerView.setText(text);
+                        }
+
+                    });
+
+
+                } catch(InterruptedException e) {
+
+                }
+
+
+            }
+        }
+
     }
 
 }
