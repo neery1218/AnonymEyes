@@ -9,40 +9,56 @@
     <FrameLayout
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </FrameLayout>
+        android:layout_height="match_parent"></FrameLayout>
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#44000000">
+        <TextView
+            android:id="@+id/titleView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="40dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <android.widget.Space
             android:layout_width="match_parent"
             android:layout_height="15dp" />
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="top"
-            android:layout_height="match_parent">
+            android:orientation="horizontal">
 
             <android.widget.Space
                 android:layout_width="10dp"
                 android:layout_height="match_parent" />
 
             <com.radiancetops.anonymeyes.RecorderView
-                android:layout_width="30dp"
                 android:id="@+id/recorderView"
+                android:layout_width="30dp"
                 android:layout_height="30dp" />
+
             <TextView
+                android:id="@+id/timerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="0:00"
-                android:textSize="24sp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/white"
-                android:id="@+id/timerView" />
+                android:textSize="24sp" />
         </LinearLayout>
     </LinearLayout>
 
