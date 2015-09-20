@@ -3,6 +3,7 @@ package com.radiancetops.anonymeyes;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,7 +43,7 @@ public class CameraFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private Camera camera;
     private CameraPreview cameraPreview;
-    private TextView timerView;
+    private TextView timerView, titleView;
     private Handler handler;
     private long startTime;
     private TimerThread timerThread;
@@ -108,6 +109,9 @@ public class CameraFragment extends Fragment {
 */
         recorderView = (RecorderView)view.findViewById(R.id.recorderView);
         timerView = (TextView)view.findViewById(R.id.timerView);
+        titleView = (TextView)view.findViewById(R.id.titleView);
+        Typeface font = Typeface.createFromAsset(this.getActivity().getAssets(), "HelveticaNeue-Regular.ttf");
+        titleView.setTypeface(font);
         startTime = SystemClock.uptimeMillis();
         timerView.setText(""+startTime);
         timerThread.start();
