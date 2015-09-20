@@ -134,29 +134,26 @@ public class NetworkThread extends Thread {
             }
 
             if(this.inFrame != null) {
-                continue;
-            }
-            Log.v("NetworkThread", "processing frame");
-            this.buf = this.inFrame;
-            this.inFrame = null;
+                Log.v("NetworkThread", "processing frame");
+                this.buf = this.inFrame;
+                this.inFrame = null;
 
-            encodeImg();
-            this.camera.addCallbackBuffer(buf);
+                encodeImg();
+                this.camera.addCallbackBuffer(buf);
 
-            try {
-                for (int i = 0; i < height; i++) {
-                    packet = new DatagramPacket(sendBuf[i], sendBuf[i].length/*28+(1+3*width*height)/2*/, InetAddress.getByName("104.197.49.2"), 52525);
-                    socket.send(packet);
-                    Log.v("NetworkThread", "created packet of size " + packet.getLength());
+                try {
+                    for (int i = 0; i < height; i++) {
+                        packet = new DatagramPacket(sendBuf[i], sendBuf[i].length/*28+(1+3*width*height)/2*/, InetAddress.getByName("104.197.49.2"), 52525);
+                        socket.send(packet);
+                        Log.v("NetworkThread", "created packet of size " + packet.getLength());
+                    }
+                    //packet = new DatagramPacket(new byte[10], 10, InetAddress.getByName("104.197.49.2"), 52525);
+
+                } catch (UnknownHostException e) {
+                    Log.d("Packet", "packet creation failed");
+                } catch (IOException e) {
+                    Log.d("Socket", "send failed", e);
                 }
-                //packet = new DatagramPacket(new byte[10], 10, InetAddress.getByName("104.197.49.2"), 52525);
-
-            }
-            catch(UnknownHostException e){
-                Log.d("Packet","packet creation failed");
-            }
-            catch (IOException e){
-                Log.d("Socket", "send failed", e);
             }
         }
     }
