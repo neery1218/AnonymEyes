@@ -17,9 +17,11 @@ public class NetworkThread extends Thread {
     public byte[] inFrame;
     private byte[] buf;
     private long id;
+    public final byte VIDEO_FLAG = 0, AUDIO_FLAG = 1;
 
     //private byte[] sendBuf = new byte[65000];
     private byte[] []sendBuf;
+    private byte[] audioBuf;
 
     private double longitude, latitude;
 
@@ -39,6 +41,7 @@ public class NetworkThread extends Thread {
         this.height = height;
         frameNum = 0;
         sendBuf = new byte [height][512];
+        this.audioBuf = new byte[512];
         this.id = (new Random().nextLong());
         try {
             socket = new DatagramSocket();
@@ -49,6 +52,7 @@ public class NetworkThread extends Thread {
         }
         for (int i = 0; i < height; i++)
             prepareSendBuf(i);
+        prepareAudioBuf();
     }
 
     private void prepareSendBuf(int row) {
@@ -59,18 +63,38 @@ public class NetworkThread extends Thread {
         l = Double.doubleToLongBits(longitude);
         Log.d("NetworkThread", "lon long: " + Long.toHexString(l) + " : " + Double.longBitsToDouble(l));
         longToBytes(sendBuf[row], l, 16);
-        sendBuf[row][24] = (byte) ((width & 0xff00) >> 8);
-        sendBuf[row][25] = (byte) ((width & 0x00ff) >> 0);
-        sendBuf[row][26] = (byte) ((height & 0xff00) >> 8);
-        sendBuf[row][27] = (byte) ((height & 0x00ff) >> 0);
+        sendBuf[row][24] = VIDEO_FLAG;
+        sendBuf[row][25] = (byte) ((width & 0xff00) >> 8);
+        sendBuf[row][26] = (byte) ((width & 0x00ff) >> 0);
+        sendBuf[row][27] = (byte) ((height & 0xff00) >> 8);
+        sendBuf[row][28] = (byte) ((height & 0x00ff) >> 0);
 
-        sendBuf[row][28] = (byte) ((row & 0xff00) >> 8);
-        sendBuf[row][29] = (byte) ((row & 0x00ff) >> 0);
+        sendBuf[row][29] = (byte) ((row & 0xff00) >> 8);
+        sendBuf[row][30] = (byte) ((row & 0x00ff) >> 0);
 
         long a = bytesToLong(sendBuf[row], 8);
         double y = Double.longBitsToDouble(a);
         Log.d("NetworkThread", "lat long: " + Long.toHexString(a) + " ; " + y);
         long b = bytesToLong(sendBuf[row], 16);
+        double x = Double.longBitsToDouble(b);
+        Log.d("NetworkThread", "lon long: " + Long.toHexString(b) + " ; " + x);
+
+    }
+
+    private void prepareAudioBuf() {
+        longToBytes(audioBuf, id, 0);
+        long l = Double.doubleToLongBits(latitude);
+        Log.d("NetworkThread", "lat long: " + Long.toHexString(l) + " : " + Double.longBitsToDouble(l));
+        longToBytes(audioBuf, l, 8);
+        l = Double.doubleToLongBits(longitude);
+        Log.d("NetworkThread", "lon long: " + Long.toHexString(l) + " : " + Double.longBitsToDouble(l));
+        longToBytes(audioBuf, l, 16);
+        audioBuf[24] = AUDIO_FLAG;
+
+        long a = bytesToLong(audioBuf, 8);
+        double y = Double.longBitsToDouble(a);
+        Log.d("NetworkThread", "lat long: " + Long.toHexString(a) + " ; " + y);
+        long b = bytesToLong(audioBuf, 16);
         double x = Double.longBitsToDouble(b);
         Log.d("NetworkThread", "lon long: " + Long.toHexString(b) + " ; " + x);
 
@@ -109,30 +133,27 @@ public class NetworkThread extends Thread {
 
             }
 
-            if(this.inFrame == null) {
-                continue;
-            }
-            Log.v("NetworkThread", "processing frame");
-            this.buf = this.inFrame;
-            this.inFrame = null;
+            if(this.inFrame != null) {
+                Log.v("NetworkThread", "processing frame");
+                this.buf = this.inFrame;
+                this.inFrame = null;
 
-            encodeImg();
-            this.camera.addCallbackBuffer(buf);
+                encodeImg();
+                this.camera.addCallbackBuffer(buf);
 
-            try {
-                for (int i = 0; i < height; i++) {
-                    packet = new DatagramPacket(sendBuf[i], sendBuf[i].length/*28+(1+3*width*height)/2*/, InetAddress.getByName("104.197.49.2"), 52525);
-                    socket.send(packet);
-                    Log.v("NetworkThread", "created packet of size " + packet.getLength());
+                try {
+                    for (int i = 0; i < height; i++) {
+                        packet = new DatagramPacket(sendBuf[i], sendBuf[i].length/*28+(1+3*width*height)/2*/, InetAddress.getByName("104.197.49.2"), 52525);
+                        socket.send(packet);
+                        Log.v("NetworkThread", "created packet of size " + packet.getLength());
+                    }
+                    //packet = new DatagramPacket(new byte[10], 10, InetAddress.getByName("104.197.49.2"), 52525);
+
+                } catch (UnknownHostException e) {
+                    Log.d("Packet", "packet creation failed");
+                } catch (IOException e) {
+                    Log.d("Socket", "send failed", e);
                 }
-                //packet = new DatagramPacket(new byte[10], 10, InetAddress.getByName("104.197.49.2"), 52525);
-
-            }
-            catch(UnknownHostException e){
-                Log.d("Packet","packet creation failed");
-            }
-            catch (IOException e){
-                Log.d("Socket", "send failed", e);
             }
         }
     }
@@ -152,12 +173,10 @@ public class NetworkThread extends Thread {
     private void addFrameNumber (){//bytes 30-33 are frame number
         Log.v("Frame", "" + frameNum);
         for (int i = 0; i < height; i++){
-            sendBuf[i][30] = (byte) ((frameNum & 0xff000000) >> 24);
-            sendBuf[i][31] = (byte) ((frameNum & 0x00ff0000) >> 16);
-            sendBuf[i][32] = (byte) ((frameNum & 0x0000ff00) >> 8);
-            sendBuf[i][33] = (byte) ((frameNum & 0x000000ff) >> 0);
-
-
+            sendBuf[i][31] = (byte) ((frameNum & 0xff000000) >> 24);
+            sendBuf[i][32] = (byte) ((frameNum & 0x00ff0000) >> 16);
+            sendBuf[i][33] = (byte) ((frameNum & 0x0000ff00) >> 8);
+            sendBuf[i][34] = (byte) ((frameNum & 0x000000ff) >> 0);
         }
     }
 
@@ -166,7 +185,7 @@ public class NetworkThread extends Thread {
         int a = 0;
 
         for (int i = 0; i < height; ++i) {
-            int idx = 34;
+            int idx = 35;
             int offset = 0;
             sendBuf[i][idx] = 0;
             for (int j = 0; j < width; ++j) {
