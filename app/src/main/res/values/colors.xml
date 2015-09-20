@@ -16,5 +16,7 @@
     <color name="brown">#ACA46F</color>
     <color name="pink">#D2527F</color>
     <color name="purple">#8e44ad</color>
+    <color name="buttonRed">#EE6E73</color>
+
 
 </resources>
