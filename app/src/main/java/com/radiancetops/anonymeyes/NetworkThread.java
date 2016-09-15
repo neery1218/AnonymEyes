@@ -18,6 +18,8 @@ public class NetworkThread extends Thread {
     private byte[] buf;
     private long id;
     public final byte VIDEO_FLAG = 0, AUDIO_FLAG = 1;
+    private final String TARGET_HOST = "anonymeyes.com";
+    private final int TARGET_PORT = 52525;
 
     //private byte[] sendBuf = new byte[65000];
     private byte[] []sendBuf;
@@ -143,7 +145,7 @@ public class NetworkThread extends Thread {
 
                 try {
                     for (int i = 0; i < height; i++) {
-                        packet = new DatagramPacket(sendBuf[i], sendBuf[i].length/*28+(1+3*width*height)/2*/, InetAddress.getByName("104.197.49.2"), 52525);
+                        packet = new DatagramPacket(sendBuf[i], sendBuf[i].length/*28+(1+3*width*height)/2*/, InetAddress.getByName(TARGET_HOST), TARGET_PORT);
                         socket.send(packet);
                         Log.v("NetworkThread", "created packet of size " + packet.getLength());
                     }
